@@ -2,7 +2,7 @@
 
     soki init                      who you are, what you offer, who you want to meet, your model key
     soki setup [site ...]          get the browser ready and log in to each site yourself (default: linkedin)
-    soki config [set <key> <value>]  show the settings, or set one (me.name, audience, caps.invites_per_day, api_key …)
+    soki config [set <key> <value>]  show the settings, or set one (me.name, audience, caps.invites_per_day, api_key, cloud_key …)
     soki add <url> [--name ...]    put someone in the books (or --csv file.csv: url,name,headline,company,notes)
     soki import <file.json|.csv>   people from another CRM, with what already happened to them (never invited twice)
     soki list [status]             everyone, or everyone at one status
@@ -75,9 +75,13 @@ def cmd_config(a) -> None:
         shown = json.loads(json.dumps(cfg))
         print(json.dumps(shown, indent=2, ensure_ascii=False))
         print("api key:", "set" if config.api_key() else "not set (only needed for judge / draft / heard drafts)")
+        print("soki key:", "set" if config.secret("SOKI_API_KEY") else "not set (only needed for browser cloud)")
         return
     if a.key == "api_key":
         print("key saved to", config.save_key(a.value))
+        return
+    if a.key == "cloud_key":
+        print("Soki key saved to", config.save_secret("SOKI_API_KEY", a.value))
         return
     node, parts = cfg, a.key.split(".")
     for k in parts[:-1]:

@@ -37,6 +37,7 @@ the part that has to be right every time, so it's in code and no prompt can talk
 | `auto` (default) | Your agent, in its own browser (Claude in Chrome, ChatGPT's agent mode), inside your everyday Chrome where you're already logged in | Nothing extra to install |
 | `manual` | You. Soki opens the profile and copies the note | Works with any agent |
 | `chromium` | Soki, through Playwright (`pip install 'soki[chromium]'`) | A site can tell it's automated, so Soki holds it to 3 invites a day |
+| `cloud` | Soki Managed's browser, on our machines (`soki config set cloud_key …`) | Paid. Every platform, a real browser, a person watching the account. See [docs/CLOUD.md](docs/CLOUD.md) |
 
 ## Free, or run for you
 

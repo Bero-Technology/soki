@@ -3,7 +3,8 @@
 Everything lives in one folder on the user's own machine: SOKI_HOME, else ~/.soki.
 
     config.json   who you are, what you offer, who you want to meet, the caps, the model
-    keys.env      the model key (OPENAI_API_KEY=...), never written into config.json
+    keys.env      keys, never written into config.json: the model key (OPENAI_API_KEY=...) and the Soki key
+                  for browser "cloud" (SOKI_API_KEY=...)
     books.db      the books: people, every touch, every draft (oe-style: one SQLite file is the truth)
 """
 from __future__ import annotations
@@ -25,7 +26,8 @@ DEFAULTS: dict = {
     # Any OpenAI-compatible endpoint: OpenAI, OpenRouter, Azure's /openai/v1, a local Ollama or LM Studio.
     "base_url": "https://api.openai.com/v1",
     "model": "gpt-5-mini",
-    "browser": "auto",              # auto | agent | manual | chromium | the path to a soki-browser executable
+    "browser": "auto",              # auto | agent | manual | chromium | cloud | the path to a soki-browser executable
+    "cloud_url": "https://api.gosoki.com/v1",   # browser "cloud": Soki Managed's browser, reached with a Soki key
 }
 
 
@@ -80,21 +82,36 @@ def check(cfg: dict) -> None:
             raise SystemExit(f"config {k} must be a list of phrases")
 
 
+def _keys() -> dict:
+    f = home() / "keys.env"
+    out: dict = {}
+    if f.is_file():
+        for line in f.read_text().splitlines():
+            name, _, val = line.partition("=")
+            if name.strip() and not name.strip().startswith("#"):
+                out[name.strip()] = val.strip().strip('"').strip("'")
+    return out
+
+
+def secret(name: str) -> str:
+    """A key from the environment, else SOKI_HOME/keys.env. Empty when neither has it."""
+    return (os.environ.get(name) or _keys().get(name, "")).strip()
+
+
+def save_secret(name: str, value: str) -> Path:
+    """Set one key in keys.env and keep the others (mode 600)."""
+    keys = _keys()
+    keys[name] = value.strip()
+    f = home() / "keys.env"
+    f.write_text("".join(f"{k}={v}\n" for k, v in keys.items()))
+    f.chmod(0o600)
+    return f
+
+
 def api_key() -> str:
-    """OPENAI_API_KEY from the environment, else SOKI_HOME/keys.env. Empty when neither has it."""
-    k = os.environ.get("OPENAI_API_KEY", "")
-    if not k:
-        f = home() / "keys.env"
-        if f.is_file():
-            for line in f.read_text().splitlines():
-                name, _, val = line.partition("=")
-                if name.strip() == "OPENAI_API_KEY":
-                    k = val
-    return k.strip().strip('"').strip("'")
+    """OPENAI_API_KEY: the model key, only for judge / draft / heard drafts."""
+    return secret("OPENAI_API_KEY")
 
 
 def save_key(key: str) -> Path:
-    f = home() / "keys.env"
-    f.write_text(f"OPENAI_API_KEY={key.strip()}\n")
-    f.chmod(0o600)
-    return f
+    return save_secret("OPENAI_API_KEY", key)

@@ -7,6 +7,8 @@
 
     manual        free and open: Soki opens the profile in your own browser, puts the note on your clipboard, and you
                   press Connect and Send yourself. You confirm, Soki records it. Nothing is automated.
+    cloud         Soki Managed: our browser on our machines, reached over HTTPS with a Soki key (soki/cloud.py).
+                  The browser is not in this package; the API checks your plan and the caps again on its side.
     <a path>      any executable that speaks the soki-browser protocol: `<exe> <command> [args]` prints one JSON object.
                   You can write your own.
 
@@ -191,6 +193,9 @@ def get(cfg: dict) -> Driver:
         return Agent()
     if b == "manual":
         return Manual()
+    if b == "cloud":
+        from .cloud import Cloud  # noqa: PLC0415
+        return Cloud(cfg)
     if b == "chromium":
         from .chromium import Chromium  # noqa: PLC0415  (optional: pip install 'soki[chromium]')
         return Chromium()
