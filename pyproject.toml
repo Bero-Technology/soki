@@ -1,11 +1,25 @@
 [project]
 name = "soki"
 version = "0.1.0"
-description = "A sales CRM that runs on your own machine, on your own model key: it judges who to meet, writes the note, and keeps your LinkedIn account safe."
+description = "Your own sales agent: Claude, Cursor or Codex finds who to meet, writes each note, and sends inside safe limits held in code."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"
 dependencies = []
+authors = [{ name = "Bero Technology", email = "henry@bero.video" }]
+keywords = ["crm", "sales", "linkedin", "mcp", "claude", "ai-agent", "outreach"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Topic :: Office/Business",
+]
+
+[project.urls]
+Homepage = "https://gosoki.com"
+Repository = "https://github.com/Bero-Technology/soki"
+Issues = "https://github.com/Bero-Technology/soki/issues"
 
 [project.scripts]
 soki = "soki.cli:main"
